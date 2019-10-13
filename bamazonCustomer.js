@@ -63,7 +63,45 @@ var shopping = function() {
 
           shopping();
         } else {
-          console.log("all is ok");
+          //   console.log("inquire success");
+          //handles quant if we don't have enough
+          inquirer
+            .prompt({
+              name: "quantity",
+              type: "input",
+              message: "How many of these bad bois do you want?"
+            })
+            .then(function(answer2) {
+              var quantity = answer2.quantity;
+              if (quantity > res[0].stock_quantity) {
+                console.log(
+                  "My bad brosiv but we only got " +
+                    res[0].stock_quantity +
+                    " items of that boi"
+                );
+                shopping();
+              } else {
+                console.log("");
+                console.log(res[0].products_name + " purchased");
+                console.log(quantity + " qty @ $" + res[0].price);
+
+                var newQuantity = res[0].stock_quantity - quantity;
+                connection.query(
+                  "UPDATE products SET stock_quantity = " +
+                    newQuantity +
+                    " WHERE id = " +
+                    res[0].id,
+                  function(err, resUpdate) {
+                    if (err) throw err;
+                    console.log("");
+                    console.log("Your order about to go out real soon my guy");
+                    console.log("Big bless for pulling through...!");
+                    console.log("");
+                    connection.end();
+                  }
+                );
+              }
+            });
         }
       });
     });
