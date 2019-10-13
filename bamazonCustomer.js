@@ -21,22 +21,52 @@ var display = function() {
     console.log("");
     console.log("Find Your Product Below");
     console.log("");
- 
-  var table = new Table({
-    head: ["Product Id", "Product Description", "Cost"],
-    colWidths: [12, 50, 8],
-    colAligns: ["center", "left", "right"],
-    style: {
-      head: ["aqua"],
-      compact: true
+
+    var table = new Table({
+      head: ["Product Id", "Product Description", "Cost"],
+      colWidths: [12, 50, 8],
+      colAligns: ["center", "left", "right"],
+      style: {
+        head: ["aqua"],
+        compact: true
+      }
+    });
+    //loops through table
+    for (var i = 0; i < res.length; i++) {
+      table.push([res[i].id, res[i].products_name, res[i].price]);
     }
+    console.log(table.toString());
+    console.log("");
+    shopping();
   });
-  //loops through table
-  for (var i = 0; i < res.length; i++) {
-    table.push([res[i].id, res[i].products_name, res[i].price]);
-  }
-  console.log(table.toString());
-  console.log("");
-   });
 };
+//use inq to ask cust for which product and how many to purchase
+
+var shopping = function() {
+  inquirer
+    .prompt({
+      name: "productToBuy",
+      type: "input",
+      message: "Enter the product Id of the item you want my guy.!"
+    })
+    .then(function(answer1) {
+      var selection = answer1.productToBuy;
+      // use connection.query to connect q to database
+      connection.query("SELECT * FROM products WHERE Id=?", selection, function(
+        err,
+        res
+      ) {
+        //handles error if item selected doesn't exist
+        if (err) throw err;
+        if (res.length === 0) {
+          console.log("My guy we don't sell that here, check the list");
+
+          shopping();
+        } else {
+          console.log("all is ok");
+        }
+      });
+    });
+};
+
 display();
